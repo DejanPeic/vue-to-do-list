@@ -1,0 +1,230 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  <style type="text/css">
+   /* Relevant resets */
+
+
+/* Reset the default browser styles on list items */
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+
+/* Global Styles */
+
+body {
+  line-height: 1;
+  font-family: "Lato", sans-serif;
+  background-color: #EFF1F2;
+}
+
+.container {
+  width: 70%;
+  margin: 1em auto 3em;
+  border: 1px solid #efefef;
+}
+
+.panel,
+li {
+  /* Use flexbox */
+  display: block;
+  overflow:hidden;
+  /* Center everything inside .panel and li vertically */
+  align-items: center;
+  /* Distribute space evenly between the contents*/
+  justify-content: space-between;
+  list-style-type: none;
+  padding: 10px;
+  border-bottom: 1px solid #efefef;
+  background-color: #E7E8EB;
+}
+
+.text-input {
+  border: 1px solid #dedede;
+  padding-left: 10px;
+  width: 70%;
+  height: 35px;
+  color: #555;
+}
+
+button {
+  color: #555;
+  background-color: #FFFFFF;
+  border: 1px solid #bbb;
+  outline: 0;
+  width: 100px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+
+/* Task  area */
+
+.list li {
+  background-color: #3465A4;
+}
+
+.delete {
+  background-color: red;
+  border: 1px solid #3465A4;
+  color: #ddd;
+
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.list li:hover > .delete {
+  /* Show the delete button when hovering over each list item */
+  visibility: visible;
+}
+
+.list label {
+  padding-right: 10px;
+  display: inline-block;
+  width: 70%;
+  font-size: 18px;
+  line-height: 24px;
+  color: #fcfcfc;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.list li.done label {
+  color: #d9d9d9;
+  text-decoration: line-through;
+}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+</script>  
+  
+  </head>
+  <body>
+<!-- Main Div Holding our Application Data -->
+<div class="container" id="todo">
+  <!-- Panel for holding our input -->
+  <section class="panel">
+
+    <input type="checkbox" id="mark-all">
+    <input type="text" placeholder="What do you need to do?" autofocus class="text-input" v-model="newTask">
+    <button v-on:click="addTask();setFirstPage()">Add task</button>
+
+  </section>
+
+  <!-- Unorderd list for holding our todo items -->
+  <ul class="list">
+
+  
+   <li v-for="task in paginate">
+      
+
+      <div>{{ task.text }} </div>
+<span class="delete" v-on:click="removeTask(task);">Remove task</span>
+     
+
+    </li>
+  
+    
+ 
+	
+	
+	
+	
+	
+<ul>
+
+    <li v-for="pageNumber in totalPages" v-if="pageNumber > 1 || pageNumber == 1">
+    <a v-bind:key="pageNumber" href="#"  v-on:click="setPage(pageNumber)">{{ pageNumber }}</a>
+    </li>
+	
+</ul>
+  </ul>
+
+  <!-- This stringifies the contents of the data object and displays it on the page -->
+  <pre><!--{{ $data }}--></pre>
+
+</div>
+
+  
+  
+  <script>
+  //Create a new Vue instance
+new Vue({
+
+  //Bind this Vue instance to our container div with an ID of todo
+  el: "#todo",
+
+  //This is where the data for our application will be held
+  data: {
+    newTask: "",
+    taskList: [],
+	//Set pagination vars
+	currentPage: 1,
+    itemsPerPage: 2,
+    resultCount: 0,
+	pageNum: 1
+  },
+
+  //This is where we will register the methods we want to use in our application
+  methods: {
+
+    addTask: function() {
+      //trim() is used to remove whitespace from both ends of a string
+      var task = this.newTask.trim();
+      //if task is not an empty string
+      if (task) {
+        //Push an object containing the task to the taskList array
+        this.taskList.push({
+          text: task,
+          checked: false
+        });
+        //Reset newTask to an empty string so the input field is cleared
+        this.newTask = "";
+      }
+    },
+	
+	 setPage: function( pageNumber ) {
+          this.currentPage = pageNumber
+		  
+        },
+		
+		setFirstPage: function(){
+		 
+		 this.currentPage = this.currentPage+1;
+		
+		},
+		removeTask: function( task ){
+		
+		var index = this.taskList.indexOf(task);
+		
+		this.taskList.splice( index,1 );
+		}
+		
+  },
+  computed:{
+  totalPages: function() {
+          return Math.ceil(this.resultCount / this.itemsPerPage)
+        },
+		 paginate: function() {
+            if (!this.taskList || this.taskList.length != this.taskList.length) {
+                return
+            }
+			this.resultCount = this.taskList.length
+            if (this.currentPage >= this.totalPages) {
+              this.currentPage = this.totalPages
+            }
+			var index = this.currentPage * this.itemsPerPage - this.itemsPerPage
+            return this.taskList.slice(index, index + this.itemsPerPage)
+  }			}
+});
+  </script>
+  
+  </body>
+</html>
